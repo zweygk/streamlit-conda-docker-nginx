@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  streamlit_app:
+    container_name: streamlit_app
+    restart: always
+    build: ./app
+    volumes:
+      - ./app:/streamlit_app
+    ports:
+      - "8501:8501"
+    stdin_open: true
+    tty: true
+    command: conda run -n streamlit-app-env python -m streamlit.cli run /streamlit_app/app.py --server.port=8501
+    networks:
+      - st
+
+  nginx:
+    container_name: nginx
+    restart: always
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - streamlit_app
+    networks:
+      - st
+
+networks:
+  st:
